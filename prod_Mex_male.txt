@@ -1,0 +1,119 @@
+PennController.ResetPrefix(null);
+
+PennController.Sequence( "setcounter", "Info", "Introduction", "Real_text", randomize("Target_trials"), "send", "exit");
+
+//Introduction screen
+PennController("Info",
+   defaultText.settings.center() //Sets default position for all Text elements
+   ,
+   defaultButton.settings.center() //Sets default position for all Button elements
+   ,
+   defaultTextInput.settings.center() //Sets default position for all TextInput elements
+   ,
+   defaultScale.settings.center() //Sets default position for all Scale elements
+   ,
+    //Prompts subject for gender
+     newText("ID","Prolific ID:")
+     .settings.bold()
+     .settings.center()
+     .settings.css("font-size", "1.25em")
+     .print()
+    ,
+    //Introduces a text input element to log answers                          
+    newTextInput("prolificID", "")
+    .settings.log()
+    .settings.center()
+    .print()
+    .wait() //Waits till subject has entered
+    ,
+    newVar("prolificID")
+      .settings.global()          // Make it globally accessible
+      .set( getTextInput("prolificID") )  // And save the text from TextInput
+)
+
+PennController("Introduction",
+    newText("intro1", "Bienvenida(o) a nuestro experimento.")
+        .settings.center()
+        .settings.css("font-size", "1.25em")
+        .print()
+    ,    
+    newText("intro2", "En esta prueba vas a leer 24 situaciones cortas. Despues se te hara una pregunta. Por favor lee toda la situacion antes de contestar la pregunta.")
+        .settings.center()
+        .settings.css("font-size", "1.25em")
+        .print()
+    ,
+    newText("intro3", "Para avanzar, presiona *siguiente*.")
+        .settings.center()
+        .settings.css("font-size", "1.25em")
+        .print()
+    ,
+    newText("intro4", "  ")
+        .print()
+    ,
+   //Creates button press to start experiment
+   newButton("next", "siguiente")
+        .settings.center()
+        .settings.css("font-size", "1.25em")
+        .print()
+        .wait()
+        .remove()
+    );
+    
+
+PennController.Template( 
+  variable => PennController("Target_trials",
+    newText("context", variable.context)
+        .settings.css("font-size", "1.2em")
+        .print()
+    ,
+    newKey(" ")
+        .wait()
+        ,
+    newAudio("sound", variable.sound)
+        .play()
+        ,
+    newKey(" ")
+        .wait()
+    ,
+    newText("target", variable.target)
+        .settings.css("font-size", "1.2em")
+        .print()
+    ,
+    newKey(" ")
+        .wait()
+        ,
+    )
+)
+
+       .log( "Num" , variable.Num )
+       .log( "Qtype", variable.Qtype)
+       .log( "a_type", variable.a_type )
+       .log( "prolificID", getVar("prolificID") )
+       
+
+
+
+
+// Creates an item labeled 'send' that will send the results
+PennController.SendResults( "send" );
+
+// The exit page
+PennController( "exit" ,
+    //goodbye
+    newText("thanks1", "*Muchas gracias*")
+        .settings.center()
+        .settings.bold()
+        .print()
+    ,
+    newText("thanks2", "Por favor da clic en la liga siguiente para reclamar tu compensacio'n.")
+        .settings.center()
+        .print()
+    ,
+    newText("thanks3", "https://app.prolific.co/submissions/complete?cc=4BB4BE15")
+        .settings.center()
+        .print()
+    ,
+    // A dummy timer we never start in order to stay on page forever
+    newTimer("dummy", 10)
+        .wait() // This will wait forever
+);
